@@ -388,6 +388,53 @@
             .game-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
             .modal-content { padding: 2rem; }
         }
+        
+        /* History Styles */
+        .history-section {
+            margin-top: 2rem;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: none; /* Shown when logged in */
+        }
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .history-card {
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .history-details p {
+            margin: 0 0 5px 0;
+            font-size: 0.9rem;
+            color: var(--text-main);
+        }
+        .history-details small {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .status-pending { background: rgba(255, 170, 0, 0.2); color: #ffaa00; border: 1px solid #ffaa00; }
+        .status-proses { background: rgba(0, 153, 255, 0.2); color: #0099ff; border: 1px solid #0099ff; }
+        .status-selesai { background: rgba(0, 204, 102, 0.2); color: #00cc66; border: 1px solid #00cc66; }
+        .status-ditolak { background: rgba(255, 51, 102, 0.2); color: #ff3366; border: 1px solid #ff3366; }
     </style>
     <!-- Firebase SDK (Compat Version) -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -411,10 +458,24 @@
         </div>
     </div>
 
+    <!-- Logout Confirmation Modal -->
+    <div id="logoutModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 350px; text-align: center; position: relative;">
+            <span onclick="document.getElementById('logoutModal').classList.remove('active')" style="position: absolute; top: 15px; right: 20px; font-size: 1.5rem; cursor: pointer; color: var(--text-muted);">&times;</span>
+            <h2 class="modal-title" style="margin-bottom: 20px;">Keluar Akun</h2>
+            <p style="color: var(--text-muted); margin-bottom: 30px; font-size: 0.9rem;">Apakah Anda yakin ingin keluar dari akun Anda?</p>
+            
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button onclick="document.getElementById('logoutModal').classList.remove('active')" style="background: rgba(255,255,255,0.1); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; flex: 1;">Batal</button>
+                <button onclick="logoutUser()" style="background: var(--danger); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; flex: 1;">Ya, Keluar</button>
+            </div>
+        </div>
+    </div>
+
     <header>
         <div class="logo">VOLTRA</div>
         <div style="display: flex; gap: 10px; align-items: center;">
-            <div id="userProfileChip" style="display: none; align-items: center; gap: 8px; background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 20px; border: 1px solid var(--primary-neon); cursor: pointer;" onclick="logoutUser()" title="Klik untuk Keluar">
+            <div id="userProfileChip" style="display: none; align-items: center; gap: 8px; background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 20px; border: 1px solid var(--primary-neon); cursor: pointer;" onclick="document.getElementById('logoutModal').classList.add('active')" title="Klik untuk Keluar">
                 <img id="userProfilePic" src="" alt="Profile" style="width: 24px; height: 24px; border-radius: 50%;">
                 <span id="userProfileName" style="color: white; font-size: 0.9rem; font-weight: bold;"></span>
             </div>
@@ -510,6 +571,13 @@
 
                     <div id="withdrawMessage" class="alert"></div>
                 </form>
+                
+                <div id="historySection" class="history-section">
+                    <h3 style="margin-bottom: 10px; font-size: 1.1rem; color: var(--primary-neon);">Riwayat Penarikan Anda</h3>
+                    <div id="historyList" class="history-list">
+                        <p style="color: var(--text-muted); font-size: 0.9rem; text-align: center; margin: 20px 0;">Memuat riwayat...</p>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
@@ -605,6 +673,8 @@
                 userProfileName.textContent = username;
                 
                 loadUserFromDB();
+                loadWithdrawalHistory();
+                document.getElementById('historySection').style.display = 'block';
             } else {
                 // Belum login
                 isLoggedIn = false;
@@ -612,6 +682,8 @@
                 username = "";
                 currentBalance = 0;
                 updateBalanceUI();
+                
+                document.getElementById('historySection').style.display = 'none';
                 
                 headerAuthBtn.style.display = 'block';
                 userProfileChip.style.display = 'none';
@@ -668,6 +740,53 @@
                 console.error("DB Error:", err);
                 authMessage.textContent = "Gagal memuat data dari Database.";
                 authMessage.style.display = 'block';
+            });
+        }
+
+        function loadWithdrawalHistory() {
+            if (!db2 || !userUid) return;
+            const historyList = document.getElementById('historyList');
+            historyList.innerHTML = '<p style="color: var(--text-muted); font-size: 0.9rem; text-align: center; margin: 20px 0;">Memuat riwayat...</p>';
+            
+            db2.ref('withdrawals').orderByChild('uid').equalTo(userUid).on('value', (snapshot) => {
+                historyList.innerHTML = ''; // Kosongkan dulu
+                if (!snapshot.exists()) {
+                    historyList.innerHTML = '<p style="color: var(--text-muted); font-size: 0.9rem; text-align: center; margin: 20px 0;">Belum ada riwayat penarikan.</p>';
+                    return;
+                }
+                
+                const data = [];
+                snapshot.forEach(child => {
+                    data.push({ id: child.key, ...child.val() });
+                });
+                
+                // Urutkan dari yang paling baru
+                data.sort((a, b) => b.timestamp - a.timestamp);
+                
+                data.forEach(item => {
+                    const date = new Date(item.timestamp).toLocaleString('id-ID', {
+                        day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                    });
+                    
+                    const rpAmount = (item.amount / 1000) * 100;
+                    
+                    let statusClass = 'status-pending';
+                    let statusText = item.status || 'Pending';
+                    if (statusText.toLowerCase() === 'proses') statusClass = 'status-proses';
+                    if (statusText.toLowerCase() === 'selesai') statusClass = 'status-selesai';
+                    if (statusText.toLowerCase() === 'ditolak') statusClass = 'status-ditolak';
+                    
+                    const card = document.createElement('div');
+                    card.className = 'history-card';
+                    card.innerHTML = `
+                        <div class="history-details">
+                            <p><strong>${item.ewallet}</strong> - Rp ${rpAmount.toLocaleString('id-ID')}</p>
+                            <small>${(item.amount || 0).toLocaleString('id-ID')} VOL &bull; ${date}</small>
+                        </div>
+                        <div class="status-badge ${statusClass}">${statusText}</div>
+                    `;
+                    historyList.appendChild(card);
+                });
             });
         }
         
