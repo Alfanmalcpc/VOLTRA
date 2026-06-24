@@ -421,7 +421,7 @@
             <button id="headerAuthBtn" style="background: transparent; color: #00ff88; border: 1px solid #00ff88; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.9rem;">Login Akun</button>
             <div class="balance-container" id="balanceContainer">
                 <span class="coin-icon">💰</span>
-                <span class="balance-amount"><span id="userBalance">0</span> Pts</span>
+                <span class="balance-amount"><span id="userBalance">0</span> VOL</span>
             </div>
         </div>
     </header>
@@ -473,8 +473,8 @@
             
             <div class="withdraw-container">
                 <div class="conversion-rate">
-                    ℹ️ Jaminan Konversi: <strong>1.000 Poin = Rp1.000</strong><br>
-                    <small>Minimal penarikan: 5.000 Poin</small>
+                    ℹ️ Jaminan Konversi: <strong>1.000 VOL = Rp 100</strong><br>
+                    <small>Minimal penarikan: Rp 5.000 (50.000 VOL)</small>
                 </div>
 
                 <form id="withdrawForm">
@@ -495,8 +495,15 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="withdrawAmount">Jumlah Poin</label>
-                        <input type="number" id="withdrawAmount" class="form-control" placeholder="Minimal 5000" min="5000" required>
+                        <label for="withdrawAmount">Jumlah Penarikan</label>
+                        <select id="withdrawAmount" class="form-control" required>
+                            <option value="" disabled selected>Pilih Nominal</option>
+                            <option value="50000">Rp 5.000 (50.000 VOL)</option>
+                            <option value="100000">Rp 10.000 (100.000 VOL)</option>
+                            <option value="200000">Rp 20.000 (200.000 VOL)</option>
+                            <option value="500000">Rp 50.000 (500.000 VOL)</option>
+                            <option value="1000000">Rp 100.000 (1.000.000 VOL)</option>
+                        </select>
                     </div>
 
                     <button type="submit" class="btn-submit">Kirim Penarikan</button>
@@ -518,7 +525,7 @@
             </div>
             
             <p id="gameScoreDisplay" style="color: var(--primary-neon); font-size: 1.2rem; font-weight: bold; display: none;">Skor: <span id="gameScore">0</span></p>
-            <p id="gameWaitText" style="color: var(--text-muted); font-size: 0.9rem; margin-top: 10px;">Menunggu imbalan poin...</p>
+            <p id="gameWaitText" style="color: var(--text-muted); font-size: 0.9rem; margin-top: 10px;">Menunggu imbalan VOL...</p>
         </div>
     </div>
 
@@ -569,7 +576,7 @@
         let userUid = ""; // Menyimpan Google UID
         let currentBalance = 0;
         let isLoggedIn = false;
-        const MIN_WITHDRAW = 5000;
+        const MIN_WITHDRAW = 50000;
 
         const authModal = document.getElementById('authModal');
         const authGoogleBtn = document.getElementById('authGoogleBtn');
@@ -985,7 +992,7 @@
             gamePlayArea.style.display = 'none';
             gameScoreDisplay.style.display = 'none';
             gameWaitText.style.display = 'block';
-            gameWaitText.textContent = `Menghitung poin... (+${gameScore} Poin)`;
+            gameWaitText.textContent = `Menghitung VOL... (+${gameScore} VOL)`;
             
             setTimeout(() => {
                 modal.classList.remove('active');
@@ -994,12 +1001,12 @@
                     currentBalance += gameScore;
                     updateBalanceUI();
                     saveUserPoints(); // Simpan ke Database
-                    showToast(`Berhasil! Anda mendapatkan ${gameScore} Poin dari game ini.`);
+                    showToast(`Berhasil! Anda mendapatkan ${gameScore} VOL dari game ini.`);
                 } else {
-                    showToast(`Yah, waktu habis! Anda tidak mendapatkan poin.`);
+                    showToast(`Yah, waktu habis! Anda tidak mendapatkan VOL.`);
                 }
                 
-                gameWaitText.textContent = "Menunggu imbalan poin...";
+                gameWaitText.textContent = "Menunggu imbalan VOL...";
             }, 2000);
         }
 
@@ -1017,14 +1024,14 @@
             withdrawMessage.classList.remove('error', 'success');
             
             if (amount < MIN_WITHDRAW) {
-                withdrawMessage.textContent = `Minimal penarikan adalah ${formatNumber(MIN_WITHDRAW)} poin.`;
+                withdrawMessage.textContent = `Minimal penarikan adalah ${formatNumber(MIN_WITHDRAW)} VOL.`;
                 withdrawMessage.classList.add('error');
                 withdrawMessage.style.display = 'block';
                 return;
             }
             
             if (amount > currentBalance) {
-                withdrawMessage.textContent = 'Saldo poin Anda tidak mencukupi.';
+                withdrawMessage.textContent = 'Saldo VOL Anda tidak mencukupi.';
                 withdrawMessage.classList.add('error');
                 withdrawMessage.style.display = 'block';
                 return;
