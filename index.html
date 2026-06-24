@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VOLTRA - Play-to-Earn Game Portal</title>
+    <style>
+        /* CSS resets and variables */
+        :root {
+            --bg-dark: #0f0f13;
+            --bg-card: #1a1a24;
+            --primary-neon: #00ff88;
+            --secondary-neon: #b026ff;
+            --text-main: #ffffff;
+            --text-muted: #a0a0b0;
+            --danger: #ff3366;
+            --success: #00cc66;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        header {
+            background-color: var(--bg-card);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--secondary-neon);
+            box-shadow: 0 4px 15px rgba(176, 38, 255, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            background: linear-gradient(45deg, var(--primary-neon), var(--secondary-neon));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+        }
+
+        .balance-container {
+            display: flex;
+            align-items: center;
+            background: rgba(0, 255, 136, 0.1);
+            padding: 0.5rem 1.2rem;
+            border-radius: 30px;
+            border: 1px solid var(--primary-neon);
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .balance-container.pulse {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.6);
+        }
+
+        .coin-icon {
+            color: #ffd700;
+            font-size: 1.5rem;
+            margin-right: 10px;
+        }
+
+        .balance-amount {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary-neon);
+        }
+
+        /* Navigation */
+        nav {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            padding: 1.5rem 0;
+            background: linear-gradient(to bottom, var(--bg-card), var(--bg-dark));
+        }
+
+        .nav-btn {
+            background: transparent;
+            color: var(--text-muted);
+            border: 2px solid transparent;
+            padding: 0.8rem 2rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            color: var(--text-main);
+            border-color: rgba(176, 38, 255, 0.5);
+        }
+
+        .nav-btn.active {
+            color: var(--text-main);
+            border-color: var(--secondary-neon);
+            background: rgba(176, 38, 255, 0.1);
+            box-shadow: 0 0 15px rgba(176, 38, 255, 0.2);
+        }
+
+        /* Main Content Area */
+        main {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            color: var(--text-main);
+            text-shadow: 0 2px 10px rgba(0, 255, 136, 0.3);
+        }
+
+        /* Game Grid */
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .game-card {
+            background-color: var(--bg-card);
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 255, 136, 0.2);
+            border-color: var(--primary-neon);
+        }
+
+        .game-img {
+            width: 100%;
+            height: 150px;
+            background: linear-gradient(135deg, #2a2a35, #3a3a4a);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 3rem;
+            color: rgba(255, 255, 255, 0.2);
+        }
+
+        .game-info {
+            padding: 1.5rem;
+            text-align: center;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .game-title {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: var(--text-main);
+        }
+
+        .btn-play {
+            background: linear-gradient(90deg, var(--secondary-neon), #8a00e6);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-play:hover {
+            box-shadow: 0 0 15px var(--secondary-neon);
+            transform: scale(1.05);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: var(--bg-card);
+            padding: 3rem;
+            border-radius: 20px;
+            text-align: center;
+            border: 2px solid var(--primary-neon);
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
+            max-width: 90%;
+            width: 400px;
+        }
+
+        .timer {
+            font-size: 4rem;
+            font-weight: bold;
+            color: var(--primary-neon);
+            margin: 1.5rem 0;
+            text-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+        }
+
+        /* Withdraw Form */
+        .withdraw-container {
+            max-width: 500px;
+            margin: 0 auto;
+            background-color: var(--bg-card);
+            padding: 2.5rem;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .conversion-rate {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: rgba(176, 38, 255, 0.1);
+            border-radius: 8px;
+            border-left: 4px solid var(--secondary-neon);
+            color: var(--text-main);
+            font-weight: 500;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 1rem;
+            background-color: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: var(--text-main);
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-neon);
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.2);
+        }
+
+        .btn-submit {
+            background: linear-gradient(90deg, var(--primary-neon), #00cc66);
+            color: #000;
+            border: none;
+            padding: 1rem;
+            width: 100%;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .btn-submit:hover {
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1.5rem;
+            display: none;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .alert.error {
+            background: rgba(255, 51, 102, 0.1);
+            color: var(--danger);
+            border: 1px solid var(--danger);
+        }
+
+        .alert.success {
+            background: rgba(0, 204, 102, 0.1);
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+
+        /* Notifications */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            background-color: var(--bg-card);
+            border-left: 4px solid var(--primary-neon);
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s forwards, fadeOut 0.5s 2.5s forwards;
+            opacity: 0;
+            transform: translateX(100%);
+        }
+
+        @keyframes slideIn {
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes fadeOut {
+            to { opacity: 0; transform: translateY(-20px); }
+        }
+
+        @media (max-width: 768px) {
+            header { padding: 1rem; }
+            .logo { font-size: 1.2rem; }
+            .balance-container { padding: 0.4rem 0.8rem; }
+            .balance-amount { font-size: 1rem; }
+            nav { padding: 1rem; gap: 0.5rem; }
+            .nav-btn { padding: 0.6rem 1rem; font-size: 0.9rem; }
+            main { padding: 1rem; }
+            .game-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+            .modal-content { padding: 2rem; }
+        }
+    </style>
+    <!-- Firebase SDK (Compat Version) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+</head>
+<body>
+
+    <!-- Auth / Login Modal Overlay -->
+    <div id="authModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 400px; text-align: center; position: relative;">
+            <span id="closeAuthModal" style="position: absolute; top: 15px; right: 20px; font-size: 1.5rem; cursor: pointer; color: var(--text-muted);">&times;</span>
+            <h2 class="modal-title" style="margin-bottom: 20px;">Selamat Datang!</h2>
+            <p style="color: var(--text-muted); margin-bottom: 30px; font-size: 0.9rem;">Silakan login dengan akun Google Anda untuk mulai bermain.</p>
+            
+            <button id="authGoogleBtn" style="background: white; color: #333; border: none; padding: 12px 20px; border-radius: 25px; font-weight: bold; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; transition: all 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                <img src="https://www.svgrepo.com/show/475656/google-color.svg" width="20" height="20" alt="Google">
+                Login dengan Google
+            </button>
+            <p id="authMessage" style="color: #ff3366; margin-top: 15px; font-size: 0.9rem; display: none;"></p>
+        </div>
+    </div>
+
+    <header>
+        <div class="logo">VOLTRA</div>
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <div id="userProfileChip" style="display: none; align-items: center; gap: 8px; background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 20px; border: 1px solid var(--primary-neon); cursor: pointer;" onclick="logoutUser()" title="Klik untuk Keluar">
+                <img id="userProfilePic" src="" alt="Profile" style="width: 24px; height: 24px; border-radius: 50%;">
+                <span id="userProfileName" style="color: white; font-size: 0.9rem; font-weight: bold;"></span>
+            </div>
+            <button id="headerAuthBtn" style="background: transparent; color: #00ff88; border: 1px solid #00ff88; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.9rem;">Login Akun</button>
+            <div class="balance-container" id="balanceContainer">
+                <span class="coin-icon">💰</span>
+                <span class="balance-amount"><span id="userBalance">0</span> Pts</span>
+            </div>
+        </div>
+    </header>
+
+    <nav>
+        <button class="nav-btn active" data-target="tab-games">Games</button>
+        <button class="nav-btn" data-target="tab-withdraw">Withdraw</button>
+    </nav>
+
+    <main>
+        <!-- Tab 1: Games -->
+        <div id="tab-games" class="tab-content active">
+            <h1 class="section-title">Mainkan Game & Kumpulkan Poin</h1>
+            <div class="game-grid">
+                <div class="game-card">
+                    <div class="game-img">👾</div>
+                    <div class="game-info">
+                        <h3 class="game-title">Cyber Strike</h3>
+                        <button class="btn-play" onclick="playGame('Cyber Strike')">Main Sekarang</button>
+                    </div>
+                </div>
+                <div class="game-card">
+                    <div class="game-img">🏎️</div>
+                    <div class="game-info">
+                        <h3 class="game-title">Neon Racer</h3>
+                        <button class="btn-play" onclick="playGame('Neon Racer')">Main Sekarang</button>
+                    </div>
+                </div>
+                <div class="game-card">
+                    <div class="game-img">⚔️</div>
+                    <div class="game-info">
+                        <h3 class="game-title">Crypto Knight</h3>
+                        <button class="btn-play" onclick="playGame('Crypto Knight')">Main Sekarang</button>
+                    </div>
+                </div>
+                <div class="game-card">
+                    <div class="game-img">🧩</div>
+                    <div class="game-info">
+                        <h3 class="game-title">Block Puzzle Pro</h3>
+                        <button class="btn-play" onclick="playGame('Block Puzzle Pro')">Main Sekarang</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 2: Withdrawal -->
+        <div id="tab-withdraw" class="tab-content">
+            <h1 class="section-title">Tukarkan Poin Jadi Saldo E-Wallet</h1>
+            
+            <div class="withdraw-container">
+                <div class="conversion-rate">
+                    ℹ️ Jaminan Konversi: <strong>1.000 Poin = Rp1.000</strong><br>
+                    <small>Minimal penarikan: 5.000 Poin</small>
+                </div>
+
+                <form id="withdrawForm">
+                    <div class="form-group">
+                        <label for="ewallet">Pilih E-Wallet Tujuan</label>
+                            <select id="ewallet" class="form-control" required>
+                                <option value="" disabled selected>Pilih Provider</option>
+                                <option value="ShopeePay">ShopeePay</option>
+                                <option value="GoPay">GoPay</option>
+                                <option value="DANA">DANA</option>
+                                <option value="OVO">OVO</option>
+                            </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="accountNumber">Nomor HP / Rekening</label>
+                        <input type="text" id="accountNumber" class="form-control" placeholder="Contoh: 08123456789" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="withdrawAmount">Jumlah Poin</label>
+                        <input type="number" id="withdrawAmount" class="form-control" placeholder="Minimal 5000" min="5000" required>
+                    </div>
+
+                    <button type="submit" class="btn-submit">Kirim Penarikan</button>
+
+                    <div id="withdrawMessage" class="alert"></div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Game Modal -->
+    <div id="gameModal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 id="playingGameTitle" style="margin-bottom: 1rem;">Memuat Game...</h2>
+            <p id="gameInstructions">Sedang bermain, jangan tutup halaman ini.</p>
+            <div class="timer" id="gameTimer">15</div>
+            
+            <div id="gamePlayArea" style="position:relative; width: 100%; height: 250px; background: rgba(0,0,0,0.5); border: 2px dashed var(--primary-neon); border-radius: 10px; overflow: hidden; margin: 15px 0; display: none;">
+            </div>
+            
+            <p id="gameScoreDisplay" style="color: var(--primary-neon); font-size: 1.2rem; font-weight: bold; display: none;">Skor: <span id="gameScore">0</span></p>
+            <p id="gameWaitText" style="color: var(--text-muted); font-size: 0.9rem; margin-top: 10px;">Menunggu imbalan poin...</p>
+        </div>
+    </div>
+
+    <!-- Toasts Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script>
+        // --- KONFIGURASI FIREBASE (APP 1: AKUN & POIN) ---
+        const firebaseConfig1 = {
+            apiKey: "AIzaSyCDwociBwa-4fT326G5ENBuHJ8s_5qmG5Y",
+            authDomain: "voltra-account.firebaseapp.com",
+            databaseURL: "https://voltra-account-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "voltra-account",
+            storageBucket: "voltra-account.firebasestorage.app",
+            messagingSenderId: "330172695874",
+            appId: "1:330172695874:web:d204684d0fc29ce41874db",
+            measurementId: "G-3JELZY095Y"
+        };
+
+        // --- KONFIGURASI FIREBASE (APP 2: PENARIKAN/WITHDRAW) ---
+        const firebaseConfig2 = {
+            apiKey: "AIzaSyBsP7myOHuB8JXf-jWrUKp1bWXJY-R7bLI",
+            authDomain: "voltra-pay.firebaseapp.com",
+            databaseURL: "https://voltra-pay-default-rtdb.asia-southeast1.firebasedatabase.app/",
+            projectId: "voltra-pay",
+            storageBucket: "voltra-pay.firebasestorage.app",
+            messagingSenderId: "920855632741",
+            appId: "1:920855632741:web:4998b5ceebb3702f6c5f8c",
+            measurementId: "G-JKBGV69HN8"
+        };
+        
+        // Inisialisasi Kedua Firebase
+        let db, db2;
+        try {
+            // App 1 (Default)
+            firebase.initializeApp(firebaseConfig1);
+            db = firebase.database();
+            
+            // App 2 (VoltraPay)
+            const app2 = firebase.initializeApp(firebaseConfig2, "VoltraPay");
+            db2 = app2.database();
+        } catch (e) {
+            console.error("Firebase Initialization Error:", e);
+        }
+
+        // --- SISTEM AKUN & LOGIN GOOGLE ---
+        let username = ""; // Menyimpan Google displayName
+        let userUid = ""; // Menyimpan Google UID
+        let currentBalance = 0;
+        let isLoggedIn = false;
+        const MIN_WITHDRAW = 5000;
+
+        const authModal = document.getElementById('authModal');
+        const authGoogleBtn = document.getElementById('authGoogleBtn');
+        const authMessage = document.getElementById('authMessage');
+        const headerAuthBtn = document.getElementById('headerAuthBtn');
+        const closeAuthModal = document.getElementById('closeAuthModal');
+        const userProfileChip = document.getElementById('userProfileChip');
+        const userProfilePic = document.getElementById('userProfilePic');
+        const userProfileName = document.getElementById('userProfileName');
+
+        closeAuthModal.addEventListener('click', () => {
+            authModal.classList.remove('active');
+        });
+
+        // Pengecekan Sesi Auth Google
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                // Sudah login
+                isLoggedIn = true;
+                userUid = user.uid;
+                username = user.displayName || user.email.split('@')[0];
+                
+                headerAuthBtn.style.display = 'none';
+                userProfileChip.style.display = 'flex';
+                userProfilePic.src = user.photoURL || "https://www.svgrepo.com/show/5125/avatar.svg";
+                userProfileName.textContent = username;
+                
+                loadUserFromDB();
+            } else {
+                // Belum login
+                isLoggedIn = false;
+                userUid = "";
+                username = "";
+                currentBalance = 0;
+                updateBalanceUI();
+                
+                headerAuthBtn.style.display = 'block';
+                userProfileChip.style.display = 'none';
+                
+                headerAuthBtn.textContent = "Login Akun";
+                headerAuthBtn.style.color = "#00ff88";
+                headerAuthBtn.style.borderColor = "#00ff88";
+                headerAuthBtn.onclick = () => authModal.classList.add('active');
+            }
+        });
+
+        // Trigger Login Popup Google
+        authGoogleBtn.addEventListener('click', () => {
+            authGoogleBtn.textContent = "Memuat...";
+            authGoogleBtn.disabled = true;
+            
+            const provider = new firebase.auth.GoogleAuthProvider();
+            firebase.auth().signInWithPopup(provider).catch((error) => {
+                console.error("Auth Error:", error);
+                authMessage.textContent = "Gagal Login: " + error.message;
+                authMessage.style.display = 'block';
+                authGoogleBtn.innerHTML = '<img src="https://www.svgrepo.com/show/475656/google-color.svg" width="20" height="20" alt="Google"> Login dengan Google';
+                authGoogleBtn.disabled = false;
+            });
+        });
+
+        function logoutUser() {
+            firebase.auth().signOut().then(() => {
+                location.reload();
+            });
+        }
+
+        function loadUserFromDB() {
+            if (!db) return; // Fallback jika DB error
+            
+            const userRef = db.ref('accounts/' + userUid);
+            userRef.once('value').then((snapshot) => {
+                if (snapshot.exists()) {
+                    currentBalance = snapshot.val().points || 0;
+                } else {
+                    // Register akun baru ke DB
+                    currentBalance = 0;
+                    userRef.set({ 
+                        uid: userUid,
+                        name: username,
+                        points: 0, 
+                        createdAt: firebase.database.ServerValue.TIMESTAMP 
+                    });
+                }
+                updateBalanceUI();
+                authModal.classList.remove('active');
+                showToast(`Selamat datang, ${username}!`);
+            }).catch((err) => {
+                console.error("DB Error:", err);
+                authMessage.textContent = "Gagal memuat data dari Database.";
+                authMessage.style.display = 'block';
+            });
+        }
+        
+        // Simpan Saldo ke Firebase RTDB
+        function saveUserPoints() {
+            if (!db || !userUid) return;
+            db.ref('accounts/' + userUid).update({
+                name: username,
+                points: currentBalance,
+                lastUpdated: firebase.database.ServerValue.TIMESTAMP
+            }).catch(err => console.error(err));
+        }
+
+        // Elements
+        const balanceEl = document.getElementById('userBalance');
+        const balanceContainer = document.getElementById('balanceContainer');
+        const navButtons = document.querySelectorAll('.nav-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        // Modal Elements
+        const modal = document.getElementById('gameModal');
+        const gameTitle = document.getElementById('playingGameTitle');
+        const timerEl = document.getElementById('gameTimer');
+        const gameInstructions = document.getElementById('gameInstructions');
+        const gamePlayArea = document.getElementById('gamePlayArea');
+        const gameScoreDisplay = document.getElementById('gameScoreDisplay');
+        const scoreSpan = document.getElementById('gameScore');
+        const gameWaitText = document.getElementById('gameWaitText');
+        
+        // Withdraw Elements
+        const withdrawForm = document.getElementById('withdrawForm');
+        const withdrawMessage = document.getElementById('withdrawMessage');
+        const toastContainer = document.getElementById('toastContainer');
+
+        // Navigation Logic
+        navButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active classes
+                navButtons.forEach(b => b.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+
+                // Add active to clicked button and target tab
+                btn.classList.add('active');
+                const targetId = btn.getAttribute('data-target');
+                document.getElementById(targetId).classList.add('active');
+
+                // Reset withdraw form messages when switching tabs
+                withdrawMessage.style.display = 'none';
+            });
+        });
+
+        // Formatting number with commas
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
+        // Update Balance UI
+        function updateBalanceUI() {
+            balanceEl.textContent = formatNumber(currentBalance);
+            
+            // Add pulse animation
+            balanceContainer.classList.add('pulse');
+            setTimeout(() => {
+                balanceContainer.classList.remove('pulse');
+            }, 300);
+        }
+
+        // Init balance
+        updateBalanceUI();
+
+        // Show Toast Notification
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `<span>🎉</span> <span>${message}</span>`;
+            
+            toastContainer.appendChild(toast);
+            
+            // Remove toast after animation (3s total)
+            setTimeout(() => {
+                if (toastContainer.contains(toast)) {
+                    toastContainer.removeChild(toast);
+                }
+            }, 3000);
+        }
+
+        // Play Game Logic
+        let gameInterval;
+        let gameLogicInterval;
+        let isGameActive = false;
+        let gameScore = 0;
+
+        function playGame(name) {
+            if (!isLoggedIn) {
+                authModal.classList.add('active');
+                return;
+            }
+            gameTitle.textContent = name;
+            modal.classList.add('active');
+            
+            gameScore = 0;
+            scoreSpan.textContent = gameScore;
+            isGameActive = true;
+            
+            gamePlayArea.style.display = 'block';
+            gameScoreDisplay.style.display = 'block';
+            gameWaitText.style.display = 'none';
+            gamePlayArea.innerHTML = '';
+            
+            clearInterval(gameInterval);
+            clearInterval(gameLogicInterval);
+            
+            if (name === 'Cyber Strike') {
+                startCyberStrike();
+            } else if (name === 'Neon Racer') {
+                startNeonRacer();
+            } else if (name === 'Crypto Knight') {
+                startCryptoKnight();
+            } else if (name === 'Block Puzzle Pro') {
+                startBlockPuzzle();
+            }
+        }
+
+        function startCyberStrike() {
+            gameInstructions.textContent = "Klik alien yang muncul sebanyak-banyaknya!";
+            let timeLeft = 15;
+            timerEl.textContent = timeLeft;
+            
+            const target = document.createElement('div');
+            target.style.cssText = 'position: absolute; font-size: 2.5rem; cursor: pointer; user-select: none; transition: transform 0.1s; -webkit-tap-highlight-color: transparent;';
+            target.textContent = '👾';
+            gamePlayArea.appendChild(target);
+
+            function move() {
+                if (!isGameActive) return;
+                const maxLeft = gamePlayArea.clientWidth - 40;
+                const maxTop = gamePlayArea.clientHeight - 40;
+                target.style.left = Math.max(0, Math.floor(Math.random() * maxLeft)) + 'px';
+                target.style.top = Math.max(0, Math.floor(Math.random() * maxTop)) + 'px';
+            }
+            
+            target.addEventListener('mousedown', () => {
+                if (!isGameActive) return;
+                gameScore = Math.min(100, gameScore + 5);
+                scoreSpan.textContent = gameScore;
+                target.style.transform = 'scale(1.5)';
+                setTimeout(() => target.style.transform = 'scale(1)', 100);
+                move();
+                clearInterval(gameLogicInterval);
+                gameLogicInterval = setInterval(move, 500);
+            });
+
+            move();
+            gameLogicInterval = setInterval(move, 500);
+
+            gameInterval = setInterval(() => {
+                timeLeft--;
+                timerEl.textContent = timeLeft;
+                if (timeLeft <= 0) finishGame();
+            }, 1000);
+        }
+
+        function startNeonRacer() {
+            gameInstructions.textContent = "Tangkap koin yang jatuh sebelum hilang!";
+            let timeLeft = 15;
+            timerEl.textContent = timeLeft;
+            
+            function spawnCoin() {
+                if (!isGameActive) return;
+                const coin = document.createElement('div');
+                coin.textContent = '🟡';
+                coin.style.cssText = `position: absolute; font-size: 2rem; cursor: pointer; user-select: none; top: -40px; left: ${Math.random() * (gamePlayArea.clientWidth - 30)}px; transition: top 0.8s linear;`;
+                gamePlayArea.appendChild(coin);
+                
+                setTimeout(() => {
+                    if (coin.parentElement) {
+                        coin.style.top = gamePlayArea.clientHeight + 'px';
+                    }
+                }, 50);
+
+                coin.addEventListener('mousedown', () => {
+                    if (!isGameActive) return;
+                    gameScore = Math.min(100, gameScore + 10);
+                    scoreSpan.textContent = gameScore;
+                    coin.remove();
+                });
+
+                setTimeout(() => {
+                    if (coin.parentElement) coin.remove();
+                }, 850);
+            }
+
+            gameLogicInterval = setInterval(spawnCoin, 800);
+
+            gameInterval = setInterval(() => {
+                timeLeft--;
+                timerEl.textContent = timeLeft;
+                if (timeLeft <= 0) finishGame();
+            }, 1000);
+        }
+
+        function startCryptoKnight() {
+            gameInstructions.textContent = "Spam klik bos monster (60x) untuk menang!";
+            let timeLeft = 10;
+            timerEl.textContent = timeLeft;
+            let clicks = 0;
+            const requiredClicks = 60;
+            
+            const wrap = document.createElement('div');
+            wrap.style.cssText = 'display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%;';
+            
+            const monster = document.createElement('div');
+            monster.textContent = '👹';
+            monster.style.cssText = 'font-size: 5rem; cursor: pointer; user-select: none; transition: transform 0.1s; margin-bottom: 20px;';
+            
+            const hpBarContainer = document.createElement('div');
+            hpBarContainer.style.cssText = 'width: 80%; height: 20px; background: #333; border-radius: 10px; overflow: hidden; border: 2px solid #555;';
+            
+            const hpBar = document.createElement('div');
+            hpBar.style.cssText = 'width: 100%; height: 100%; background: #ff3366; transition: width 0.1s;';
+            
+            hpBarContainer.appendChild(hpBar);
+            wrap.appendChild(monster);
+            wrap.appendChild(hpBarContainer);
+            gamePlayArea.appendChild(wrap);
+
+            monster.addEventListener('mousedown', () => {
+                if (!isGameActive) return;
+                clicks++;
+                
+                let hpPercent = Math.max(0, 100 - (clicks / requiredClicks * 100));
+                hpBar.style.width = hpPercent + '%';
+                
+                monster.style.transform = `scale(1.2) rotate(${Math.random()*20-10}deg)`;
+                setTimeout(() => monster.style.transform = 'scale(1) rotate(0deg)', 50);
+
+                if (clicks >= requiredClicks) {
+                    gameScore = 100; // Reward
+                    scoreSpan.textContent = gameScore;
+                    monster.textContent = '💀';
+                    finishGame();
+                }
+            });
+
+            gameInterval = setInterval(() => {
+                timeLeft--;
+                timerEl.textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    gameScore = 0; // gagal = 0 poin
+                    scoreSpan.textContent = gameScore;
+                    finishGame();
+                }
+            }, 1000);
+        }
+
+        function startBlockPuzzle() {
+            gameInstructions.textContent = "Whack-a-Block! Klik kotak yang menyala hijau.";
+            let timeLeft = 15;
+            timerEl.textContent = timeLeft;
+            
+            const grid = document.createElement('div');
+            grid.style.cssText = 'display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; height: 100%; padding: 15px; box-sizing: border-box;';
+            
+            const blocks = [];
+            for(let i=0; i<9; i++) {
+                const block = document.createElement('div');
+                block.style.cssText = 'background: #333; border-radius: 10px; cursor: pointer; transition: background 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.3);';
+                block.dataset.active = "false";
+                grid.appendChild(block);
+                blocks.push(block);
+                
+                block.addEventListener('mousedown', () => {
+                    if (!isGameActive) return;
+                    if (block.dataset.active === "true") {
+                        gameScore = Math.min(100, gameScore + 5);
+                        scoreSpan.textContent = gameScore;
+                        block.style.background = '#333';
+                        block.dataset.active = "false";
+                        lightUp();
+                        clearInterval(gameLogicInterval);
+                        gameLogicInterval = setInterval(lightUp, 600);
+                    } else {
+                        // Tidak ada pengurangan poin
+                        block.style.background = '#ff3366';
+                        setTimeout(() => { if(block.dataset.active === "false") block.style.background = '#333'; }, 200);
+                    }
+                });
+            }
+            gamePlayArea.appendChild(grid);
+
+            let activeBlock = null;
+
+            function lightUp() {
+                if (!isGameActive) return;
+                if (activeBlock) {
+                    activeBlock.style.background = '#333';
+                    activeBlock.dataset.active = "false";
+                }
+                
+                const rand = Math.floor(Math.random() * 9);
+                activeBlock = blocks[rand];
+                activeBlock.style.background = '#00ff88';
+                activeBlock.dataset.active = "true";
+            }
+
+            lightUp();
+            gameLogicInterval = setInterval(lightUp, 600);
+
+            gameInterval = setInterval(() => {
+                timeLeft--;
+                timerEl.textContent = timeLeft;
+                if (timeLeft <= 0) finishGame();
+            }, 1000);
+        }
+
+        function finishGame() {
+            isGameActive = false;
+            clearInterval(gameInterval);
+            clearInterval(gameLogicInterval);
+            
+            gameInstructions.textContent = "Game Selesai!";
+            gamePlayArea.style.display = 'none';
+            gameScoreDisplay.style.display = 'none';
+            gameWaitText.style.display = 'block';
+            gameWaitText.textContent = `Menghitung poin... (+${gameScore} Poin)`;
+            
+            setTimeout(() => {
+                modal.classList.remove('active');
+                
+                if (gameScore > 0) {
+                    currentBalance += gameScore;
+                    updateBalanceUI();
+                    saveUserPoints(); // Simpan ke Database
+                    showToast(`Berhasil! Anda mendapatkan ${gameScore} Poin dari game ini.`);
+                } else {
+                    showToast(`Yah, waktu habis! Anda tidak mendapatkan poin.`);
+                }
+                
+                gameWaitText.textContent = "Menunggu imbalan poin...";
+            }, 2000);
+        }
+
+        // Withdraw Logic
+        withdrawForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            if (!isLoggedIn) {
+                authModal.classList.add('active');
+                return;
+            }
+            
+            const amount = parseInt(document.getElementById('withdrawAmount').value);
+            
+            withdrawMessage.classList.remove('error', 'success');
+            
+            if (amount < MIN_WITHDRAW) {
+                withdrawMessage.textContent = `Minimal penarikan adalah ${formatNumber(MIN_WITHDRAW)} poin.`;
+                withdrawMessage.classList.add('error');
+                withdrawMessage.style.display = 'block';
+                return;
+            }
+            
+            if (amount > currentBalance) {
+                withdrawMessage.textContent = 'Saldo poin Anda tidak mencukupi.';
+                withdrawMessage.classList.add('error');
+                withdrawMessage.style.display = 'block';
+                return;
+            }
+            
+            const ewallet = document.getElementById('ewallet').value;
+            const accountNumber = document.getElementById('accountNumber').value;
+            
+            // Jika firebase belum disetting
+            if (!db || !db2) {
+                currentBalance -= amount;
+                updateBalanceUI();
+                withdrawMessage.textContent = 'Proses dalam 1x24 jam (Offline Mode)';
+                withdrawMessage.classList.add('success');
+                withdrawMessage.style.display = 'block';
+                withdrawForm.reset();
+                return;
+            }
+
+            // Simpan ke Database Withdrawals (RTDB db2 / voltra-pay)
+            const newWithdrawRef = db2.ref('withdrawals').push();
+            newWithdrawRef.set({
+                uid: userUid,
+                name: username,
+                ewallet: ewallet,
+                accountNumber: accountNumber,
+                amount: amount,
+                timestamp: firebase.database.ServerValue.TIMESTAMP,
+                status: "Pending" // Status awal penarikan
+            }).then(() => {
+                // Success
+                currentBalance -= amount;
+                updateBalanceUI();
+                saveUserPoints(); // Update saldo di database (db1)
+                
+                withdrawMessage.textContent = 'Proses dalam 1x24 jam';
+                withdrawMessage.classList.add('success');
+                withdrawMessage.style.display = 'block';
+                
+                withdrawForm.reset();
+            }).catch((err) => {
+                console.error(err);
+                withdrawMessage.textContent = 'Gagal memproses penarikan. Cek koneksi Firebase.';
+                withdrawMessage.classList.add('error');
+                withdrawMessage.style.display = 'block';
+            });
+        });
+    </script>
+</body>
+</html>
