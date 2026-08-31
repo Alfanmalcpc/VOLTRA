@@ -1282,5 +1282,20 @@
             });
         }
     </script>
+    <script>
+        // Menghubungkan setiap tombol dengan script iklan Monetag
+        document.querySelectorAll('button, .btn-play, .btn-submit, .nav-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                if (!document.getElementById('monetag-ad-script-dynamic')) {
+                    var adScript = document.createElement('script');
+                    adScript.id = 'monetag-ad-script-dynamic';
+                    adScript.src = "https://5gvci.com/act/files/tag.min.js?z=11696223";
+                    adScript.setAttribute('data-cfasync', 'false');
+                    adScript.async = true;
+                    document.body.appendChild(adScript);
+                }
+            });
+        });
+    </script>
 </body>
 </html>
