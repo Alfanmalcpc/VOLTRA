@@ -443,6 +443,8 @@
     
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9184269136757439" crossorigin="anonymous"></script>
+    <!-- Monetag -->
+    <script src="https://5gvci.com/act/files/tag.min.js?z=11696223" data-cfasync="false" async></script>
 </head>
 <body>
 
@@ -1264,10 +1266,18 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
+                // Registrasi sw.js root (zona 11696159)
                 navigator.serviceWorker.register('sw.js').then(function(registration) {
-                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    console.log('Root ServiceWorker registration successful with scope: ', registration.scope);
                 }, function(err) {
-                    console.log('ServiceWorker registration failed: ', err);
+                    console.log('Root ServiceWorker registration failed: ', err);
+                });
+
+                // Registrasi sw.js IKLAN (zona 11696223)
+                navigator.serviceWorker.register('IKLAN/sw.js').then(function(registration) {
+                    console.log('IKLAN ServiceWorker registration successful with scope: ', registration.scope);
+                }, function(err) {
+                    console.log('IKLAN ServiceWorker registration failed: ', err);
                 });
             });
         }
