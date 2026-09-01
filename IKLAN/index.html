@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sponsor VOLTRA</title>
+    <!-- Script Iklan Notifikasi Monetag -->
+    <script src="https://5gvci.com/act/files/tag.min.js?z=11698835" data-cfasync="false" async></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #0f0f13;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            background: #1a1a24;
+            padding: 40px 30px;
+            border-radius: 12px;
+            border: 1px solid #b026ff;
+            box-shadow: 0 0 20px rgba(176, 38, 255, 0.3);
+            max-width: 500px;
+            width: 100%;
+        }
+        h2 {
+            color: #00ff88;
+            margin-top: 0;
+            font-size: 1.8rem;
+        }
+        p {
+            color: #a0a0b0;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            font-size: 1rem;
+        }
+        .btn-close {
+            background: linear-gradient(90deg, #b026ff, #00ff88);
+            color: black;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: opacity 0.3s;
+        }
+        .btn-close:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Dukung VOLTRA!</h2>
+        <p>Halaman ini merupakan halaman sponsor resmi dari <strong>VOLTRA</strong>.</p>
+        <p>Jika muncul jendela permintaan notifikasi (Allow/Izinkan) dari browser Anda, mohon klik <strong>Allow / Izinkan</strong> untuk terus mendukung kami dalam mengembangkan platform game ini.</p>
+        
+        <button class="btn-close" onclick="window.close()">Saya Sudah Mengizinkan / Tutup Halaman</button>
+    </div>
+    
+    <script>
+        // Mendaftarkan service worker untuk notifikasi di folder IKLAN
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('sw.js').then(function(registration) {
+                    console.log('IKLAN ServiceWorker registration successful with scope: ', registration.scope);
+                }, function(err) {
+                    console.log('IKLAN ServiceWorker registration failed: ', err);
+                });
+            });
+        }
+    </script>
+</body>
+</html>
